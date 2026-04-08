@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  pending
+  waiting_payment_review
+  confirmed
+  cancelled
+  checked_in
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  lineUserId    String        @unique
+  lineDisplay   String?
+  fullName      String
+  phone         String
+  seats         Int           @default(1)
+  note          String?
+  slipUrl       String?
+  bookingCode   String?       @unique
+  qrCodePayload String?
+  status        BookingStatus @default(pending)
+  checkedInAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  statusLogs    BookingStatusLog[]
+  checkinLogs   CheckinLog[]
+
+  @@index([status])
+  @@index([phone])
+  @@index([createdAt])
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("staff")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  checkinLogs CheckinLog[]
+  statusLogs  BookingStatusLog[]
+}
+
+model CheckinLog {
+  id          String   @id @default(cuid())
+  bookingId   String
+  adminUserId String?
+  method      String   @default("qr")
+  createdAt   DateTime @default(now())
+
+  booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  adminUser AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId, createdAt])
+  @@index([adminUserId])
+}
+
+model BookingStatusLog {
+  id          String        @id @default(cuid())
+  bookingId   String
+  adminUserId String?
+  fromStatus  BookingStatus?
+  toStatus    BookingStatus
+  reason      String?
+  createdAt   DateTime      @default(now())
+
+  booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  adminUser AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId, createdAt])
+  @@index([toStatus])
+}

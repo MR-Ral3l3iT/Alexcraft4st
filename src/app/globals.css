@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --bg-soft: #f4f4f5;
+  --panel: #ffffff;
+  --text-main: #121212;
+  --text-subtle: #666666;
+  --brand: #ff6a1a;
+  --brand-soft: #fff2e9;
+  --line-soft: #e8e8ea;
+  --sidebar: #0d0d0f;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  background: var(--bg-soft);
+  color: var(--text-main);
+}
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  background: var(--sidebar);
+  color: #fff;
+}
+
+.admin-panel {
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 18px;
+  box-shadow: 0 6px 26px rgba(17, 17, 19, 0.06);
+}
+
+.accent-chip {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.muted {
+  color: var(--text-subtle);
+}
