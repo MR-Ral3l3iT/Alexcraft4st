@@ -6,7 +6,10 @@ export function proxy(request: NextRequest) {
   const isAdminPage = pathname.startsWith("/admin");
   const isAdminLogin = pathname === "/admin/login";
   const isAdminApi = pathname.startsWith("/api/admin");
-  const isPublicAdminApi = pathname === "/api/admin/login";
+  const isPublicAdminApi =
+    pathname === "/api/admin/login" ||
+    pathname === "/api/admin/preview-flex" ||
+    pathname === "/api/admin/test-flex";
 
   if (!isAdminPage && !isAdminApi) {
     return NextResponse.next();

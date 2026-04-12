@@ -12,6 +12,18 @@ async function main() {
       role: "admin"
     }
   });
+
+  await prisma.eventSettings.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      capacity: 40,
+      checkinRadiusM: 100,
+      drinkCooldownSec: 600,
+      drinkMaxPerUser: 10
+    }
+  });
 }
 
 main()

@@ -33,7 +33,7 @@ export default async function BookingDetailPage({ params }: Props) {
           <p>LINE User: {booking.lineUserId}</p>
           <p>รหัสจอง: {booking.bookingCode ?? "-"}</p>
           <p>สถานะ: {bookingStatusLabel(booking.status)}</p>
-          <p>จำนวนที่นั่ง: {booking.seats}</p>
+          <p>สิทธิ์เข้าร่วม: {booking.seats} ที่</p>
           <p>หมายเหตุ: {booking.note ?? "-"}</p>
         </div>
         <Link href="/admin/bookings" className="mt-3 inline-block text-sm text-[var(--brand)] underline">

@@ -6,6 +6,10 @@ describe("booking status transition", () => {
     expect(canTransition("pending", "waiting_payment_review")).toBe(true);
   });
 
+  it("allows waiting_payment_review -> pending (reject slip)", () => {
+    expect(canTransition("waiting_payment_review", "pending")).toBe(true);
+  });
+
   it("allows confirmed -> checked_in", () => {
     expect(canTransition("confirmed", "checked_in")).toBe(true);
   });

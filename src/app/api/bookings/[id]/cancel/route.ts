@@ -1,3 +1,4 @@
+import { syncRichMenuByBookingStatus } from "@/lib/line-richmenu";
 import { safePushTextMessage } from "@/lib/line";
 import { prisma } from "@/lib/prisma";
 import { canTransition } from "@/lib/booking-rules";
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     updated.lineUserId,
     "การจองของคุณถูกยกเลิกแล้ว หากต้องการข้อมูลเพิ่มเติม กรุณาติดต่อแอดมิน"
   );
+  await syncRichMenuByBookingStatus(updated.lineUserId, updated.status);
   auditLog("warn", "booking_cancelled", { bookingId: id, bookingCode: updated.bookingCode });
 
   return NextResponse.json(updated);

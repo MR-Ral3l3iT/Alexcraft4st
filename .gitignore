@@ -24,3 +24,9 @@ yarn-error.log*
 
 # local-only docs
 docs/README.md
+
+# user uploads (payment slips, etc.)
+/public/uploads/
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo

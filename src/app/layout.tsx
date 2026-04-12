@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { kanit } from "@/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body>{children}</body>
+      <body className={kanit.className}>{children}</body>
     </html>
   );
 }

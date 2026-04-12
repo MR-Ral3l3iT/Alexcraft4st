@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Booking" ADD COLUMN "drinkCount" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "Booking" ADD COLUMN "checkedOutAt" TIMESTAMP(3);

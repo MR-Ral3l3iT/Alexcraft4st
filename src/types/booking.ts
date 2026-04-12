@@ -8,9 +8,9 @@ export type BookingStatus =
 export type BookingPayload = {
   lineUserId: string;
   lineDisplay?: string;
+  linePictureUrl?: string;
   fullName: string;
   phone: string;
-  seats: number;
   note?: string;
   slipUrl?: string;
 };

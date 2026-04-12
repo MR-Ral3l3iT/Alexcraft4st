@@ -1,4 +1,6 @@
-import { safePushTextMessage } from "@/lib/line";
+import { syncRichMenuByBookingStatus } from "@/lib/line-richmenu";
+import { safePushFlexMessage } from "@/lib/line";
+import { buildRegistrationConfirmedFlexMessage } from "@/lib/line-flex-registration-confirmed";
 import { prisma } from "@/lib/prisma";
 import { canTransition } from "@/lib/booking-rules";
 import { auditLog } from "@/lib/security/audit";
@@ -41,10 +43,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
   });
 
   const bookingCode = updated.bookingCode ?? id;
-  await safePushTextMessage(
-    updated.lineUserId,
-    `การจองของคุณได้รับการอนุมัติแล้ว\nรหัสจอง: ${bookingCode}\nสถานะ: confirmed`
-  );
+  const flexMessage = buildRegistrationConfirmedFlexMessage({
+    fullName: updated.fullName,
+    bookingCode
+  });
+  await safePushFlexMessage(updated.lineUserId, flexMessage);
+
+  await syncRichMenuByBookingStatus(updated.lineUserId, updated.status);
   auditLog("info", "booking_approved", { bookingId: id, bookingCode });
 
   return NextResponse.json(updated);

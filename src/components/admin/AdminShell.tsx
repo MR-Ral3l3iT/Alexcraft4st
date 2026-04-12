@@ -1,36 +1,52 @@
-import { Bell, CalendarDays, ChartNoAxesCombined, QrCode, Ticket } from "lucide-react";
+"use client";
+
+import { Bell, ChartNoAxesCombined, QrCode, Settings, Ticket } from "lucide-react";
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
+import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const menu = [
   { href: "/admin/dashboard", label: "Dashboard", icon: ChartNoAxesCombined },
   { href: "/admin/bookings", label: "Bookings", icon: Ticket },
-  { href: "/admin/checkin", label: "Check-in", icon: QrCode }
+  { href: "/admin/checkin", label: "Check-in", icon: QrCode },
+  { href: "/admin/settings", label: "Settings", icon: Settings }
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   return (
-    <div className="admin-shell">
-      <aside className="admin-sidebar flex flex-col items-center gap-6 py-6">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--brand)] text-white">
-          <CalendarDays className="h-5 w-5" />
+    <div className="admin-shell block md:grid">
+      <aside className="admin-sidebar flex items-center justify-between px-4 py-3 md:flex-col md:items-center md:justify-start md:gap-6 md:px-0 md:py-6">
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-white p-1 md:h-11 md:w-11">
+          <Image src="/alex-craft-logo.svg" alt="Alex Craft Logo" width={36} height={36} className="h-auto" />
         </div>
-        <nav className="flex flex-col gap-4">
-          {menu.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
-              title={item.label}
-            >
-              <item.icon className="h-4 w-4" />
-            </Link>
-          ))}
+        <nav className="flex items-center gap-3 md:flex-col md:gap-4">
+          {menu.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex h-10 w-10 items-center justify-center rounded-xl transition ${
+                  isActive
+                    ? "bg-[var(--brand)] text-white"
+                    : "text-zinc-300 hover:bg-[var(--brand)] hover:text-white"
+                }`}
+                title={item.label}
+              >
+                <item.icon className="h-4 w-4" />
+              </Link>
+            );
+          })}
         </nav>
-        <AdminLogoutButton />
+        <div className="md:mt-auto">
+          <AdminLogoutButton />
+        </div>
       </aside>
 
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <header className="admin-panel mb-4 flex items-center justify-between px-5 py-3">
           <div>
             <p className="text-sm font-medium">Alexcraft Admin</p>

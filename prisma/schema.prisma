@@ -19,15 +19,25 @@ model Booking {
   id            String        @id @default(cuid())
   lineUserId    String        @unique
   lineDisplay   String?
+  linePictureUrl String?
   fullName      String
   phone         String
   seats         Int           @default(1)
   note          String?
   slipUrl       String?
+  paymentAmount Int?
+  paymentRef    String?       @unique
+  paymentQrPayload String?
+  paymentQrImageUrl String?
+  paymentRequestedAt DateTime?
+  paymentExpiresAt DateTime?
   bookingCode   String?       @unique
   qrCodePayload String?
   status        BookingStatus @default(pending)
   checkedInAt   DateTime?
+  drinkCount    Int           @default(0)
+  drinkLastAt   DateTime?
+  checkedOutAt  DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   statusLogs    BookingStatusLog[]
@@ -77,4 +87,22 @@ model BookingStatusLog {
 
   @@index([bookingId, createdAt])
   @@index([toStatus])
+}
+
+model EventSettings {
+  id               Int      @id @default(1)
+  capacity         Int      @default(40)
+  venueLat         Float?
+  venueLng         Float?
+  checkinRadiusM   Int      @default(100)
+  checkinStartAt   DateTime?
+  checkinEndAt     DateTime?
+  drinkCooldownSec Int      @default(600)
+  drinkMaxPerUser  Int      @default(10)
+  paymentAmountThb Int      @default(799)
+  paymentAccountNo String?
+  paymentBankName  String?
+  paymentAccountName String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

@@ -16,7 +16,14 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       seats: true,
       status: true,
       checkedInAt: true,
-      qrCodePayload: true
+      qrCodePayload: true,
+      paymentAmount: true,
+      paymentRef: true,
+      paymentQrPayload: true,
+      paymentQrImageUrl: true,
+      paymentRequestedAt: true,
+      paymentExpiresAt: true,
+      slipUrl: true
     }
   });
 

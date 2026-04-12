@@ -20,6 +20,15 @@ export async function pushTextMessage(to: string, text: string) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Flex JSON is deeply nested; strict typing adds no value here
+export async function pushFlexMessage(to: string, flexMessage: Record<string, any>) {
+  const client = getLineClient();
+  await client.pushMessage({
+    to,
+    messages: [flexMessage as never]
+  });
+}
+
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -33,6 +42,32 @@ export async function safePushTextMessage(to: string, text: string, maxAttempts 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       await pushTextMessage(to, text);
+      return { ok: true, skipped: false as const };
+    } catch (error) {
+      lastError = error;
+      if (attempt < maxAttempts) {
+        await sleep(300 * attempt);
+      }
+    }
+  }
+
+  return {
+    ok: false,
+    skipped: false,
+    reason: lastError instanceof Error ? lastError.message : "Unknown LINE API error"
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- same as pushFlexMessage
+export async function safePushFlexMessage(to: string, flexMessage: Record<string, any>, maxAttempts = 3) {
+  if (!process.env.LINE_CHANNEL_ACCESS_TOKEN) {
+    return { ok: false, skipped: true, reason: "LINE_CHANNEL_ACCESS_TOKEN is missing" };
+  }
+
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await pushFlexMessage(to, flexMessage);
       return { ok: true, skipped: false as const };
     } catch (error) {
       lastError = error;

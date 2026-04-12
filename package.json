@@ -4,7 +4,9 @@
   "description": "Event registration and check-in platform",
   "scripts": {
     "dev": "next dev",
-    "tunnel": "lt --port 3000",
+    "tunnel": "ngrok http 3000",
+    "tunnel:cf": "cloudflared tunnel --url http://localhost:3000",
+    "tunnel:lt": "lt --port 3000",
     "dev:tunnel": "concurrently -k \"npm run dev\" \"npm run tunnel\"",
     "build": "next build",
     "start": "next start",
@@ -12,7 +14,13 @@
     "test": "vitest run",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "line:richmenu:create": "node scripts/line/create-richmenu.mjs",
+    "line:richmenu:create:pending": "node scripts/line/create-richmenu.mjs --preset pending",
+    "line:richmenu:create:confirmed": "node scripts/line/create-richmenu.mjs --preset confirmed",
+    "line:richmenu:create:checked-in": "node scripts/line/create-richmenu.mjs --preset checked_in",
+    "line:richmenu:link": "node scripts/line/link-richmenu.mjs",
+    "db:reset-user-flow": "node scripts/db/reset-user-flow.mjs"
   },
   "private": true,
   "dependencies": {

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { canTransition } from "@/lib/booking-rules";
+import { syncRichMenuByBookingStatus } from "@/lib/line-richmenu";
 import { auditLog } from "@/lib/security/audit";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { sanitizeText } from "@/lib/security/input";
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       reason: "Admin marked payment as received"
     }
   });
+  await syncRichMenuByBookingStatus(updated.lineUserId, updated.status);
   auditLog("info", "booking_mark_paid", { bookingId: id, bookingCode: updated.bookingCode });
 
   return NextResponse.json(updated);

@@ -1,4 +1,6 @@
-import { safePushTextMessage } from "@/lib/line";
+import { buildCheckinConfirmedFlexMessage } from "@/lib/line-flex-checkin-confirmed";
+import { safePushFlexMessage } from "@/lib/line";
+import { syncRichMenuByBookingStatus } from "@/lib/line-richmenu";
 import { prisma } from "@/lib/prisma";
 import { canTransition } from "@/lib/booking-rules";
 import { auditLog } from "@/lib/security/audit";
@@ -72,7 +74,13 @@ export async function POST(request: NextRequest) {
     }
   });
 
-  await safePushTextMessage(booking.lineUserId, "เช็คอินเรียบร้อยแล้ว ขอให้สนุกกับงานนะครับ");
+  const flex = buildCheckinConfirmedFlexMessage({
+    fullName: booking.fullName,
+    bookingCode: booking.bookingCode ?? booking.id,
+    checkedInAt: booking.checkedInAt ?? now
+  });
+  await safePushFlexMessage(booking.lineUserId, flex);
+  await syncRichMenuByBookingStatus(booking.lineUserId, booking.status);
   auditLog("info", "booking_checked_in", { bookingId: booking.id, bookingCode: booking.bookingCode });
 
   return NextResponse.json({ message: "Checked in successfully", booking });
