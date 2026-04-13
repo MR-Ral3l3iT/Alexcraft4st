@@ -3,7 +3,7 @@
 import { LogOut, TriangleAlert } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const LIFF_PROFILE_STORAGE_KEY = "alexcraft:liffProfile";
 const LIFF_PROFILE_TTL_MS = 1000 * 60 * 60 * 12;
@@ -22,7 +22,7 @@ type CachedLiffProfile = {
   expiresAtMs: number;
 };
 
-export default function LiffCheckoutPage() {
+function LiffCheckoutPageContent() {
   const searchParams = useSearchParams();
   const [profile, setProfile] = useState<LiffProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -228,5 +228,13 @@ export default function LiffCheckoutPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LiffCheckoutPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-black" />}>
+      <LiffCheckoutPageContent />
+    </Suspense>
   );
 }

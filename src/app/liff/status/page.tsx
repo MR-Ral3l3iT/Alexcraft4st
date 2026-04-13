@@ -4,7 +4,7 @@ import { bookingStatusLabel } from "@/lib/booking";
 import { liffProfileImageSrc } from "@/lib/liff-profile-image";
 import { AlertTriangle } from "lucide-react";
 import Image from "next/image";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 type LiffProfile = {
@@ -110,7 +110,7 @@ function BookingStatusPanel({ booking }: { booking: BookingStatusResponse }) {
   );
 }
 
-export default function StatusPage() {
+function StatusPageContent() {
   const searchParams = useSearchParams();
   const [profile, setProfile] = useState<LiffProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -367,5 +367,13 @@ export default function StatusPage() {
         ) : null}
       </div>
     </main>
+  );
+}
+
+export default function StatusPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-black" />}>
+      <StatusPageContent />
+    </Suspense>
   );
 }

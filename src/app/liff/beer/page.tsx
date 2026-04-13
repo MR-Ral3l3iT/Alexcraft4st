@@ -5,7 +5,7 @@ import { liffProfileImageSrc } from "@/lib/liff-profile-image";
 import { AlertTriangle, Beer, Plus } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 type LiffProfile = {
   lineUserId: string;
@@ -38,7 +38,7 @@ type CachedLiffProfile = {
   expiresAtMs: number;
 };
 
-export default function LiffBeerPage() {
+function LiffBeerPageContent() {
   const searchParams = useSearchParams();
   const [profile, setProfile] = useState<LiffProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -307,5 +307,13 @@ export default function LiffBeerPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LiffBeerPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-black" />}>
+      <LiffBeerPageContent />
+    </Suspense>
   );
 }

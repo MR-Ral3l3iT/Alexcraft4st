@@ -6,7 +6,7 @@ import { LogIn, MapPin, PartyPopper, TriangleAlert, UserRound } from "lucide-rea
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import type { BookingStatus } from "@/types/booking";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 const LIFF_PROFILE_STORAGE_KEY = "alexcraft:liffProfile";
 
@@ -45,7 +45,7 @@ type BookingSummary = {
   linePictureUrl: string | null;
 };
 
-export default function LiffCheckinPage() {
+function LiffCheckinPageContent() {
   const searchParams = useSearchParams();
   const [lineUserId, setLineUserId] = useState("");
   const [booking, setBooking] = useState<BookingSummary | null>(null);
@@ -371,5 +371,13 @@ export default function LiffCheckinPage() {
         ) : null}
       </div>
     </main>
+  );
+}
+
+export default function LiffCheckinPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-black" />}>
+      <LiffCheckinPageContent />
+    </Suspense>
   );
 }

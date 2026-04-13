@@ -4,7 +4,7 @@ import { liffProfileImageSrc } from "@/lib/liff-profile-image";
 import { AlertTriangle, Beer } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 type LiffProfile = {
   lineUserId: string;
@@ -42,7 +42,7 @@ function mascotSrcForDrinkCount(count: number): string {
   return MASCOT_L3;
 }
 
-export default function LiffEnergyPage() {
+function LiffEnergyPageContent() {
   const searchParams = useSearchParams();
   const [profile, setProfile] = useState<LiffProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -270,5 +270,13 @@ export default function LiffEnergyPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function LiffEnergyPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-black" />}>
+      <LiffEnergyPageContent />
+    </Suspense>
   );
 }
