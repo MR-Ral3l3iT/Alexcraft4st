@@ -3,7 +3,6 @@
 import { liffProfileImageSrc } from "@/lib/liff-profile-image";
 import { AlertTriangle, Beer } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -176,12 +175,9 @@ export default function LiffEnergyPage() {
               {startingLogin ? "กำลังพาไป LINE Login..." : "Login with LINE"}
             </button>
             {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
-            <Link
-              href="/liff/status"
-              className="mt-6 inline-block text-sm text-zinc-500 underline underline-offset-2"
-            >
+            <a href="/liff/status" className="mt-6 inline-block text-sm text-zinc-500 underline underline-offset-2">
               กลับไปดูสถานะ
-            </Link>
+            </a>
           </div>
         </div>
       </main>
@@ -254,13 +250,13 @@ export default function LiffEnergyPage() {
               )}
 
               <div className="mt-6">
-                <Link
+                <a
                   href="/liff/beer"
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white shadow-sm"
                 >
                   <Beer className="h-4 w-4" />
                   ไปเติมแก้ว / พลัง
-                </Link>
+                </a>
               </div>
             </>
           ) : null}

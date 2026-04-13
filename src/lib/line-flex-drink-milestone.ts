@@ -55,13 +55,20 @@ export function buildDrinkMilestoneFlexMessage(level: DrinkMilestoneLevel, drink
       type: "bubble" as const,
       size: "mega" as const,
       hero: {
-        type: "image" as const,
-        url: heroUrl,
-        size: "full" as const,
-        aspectMode: "cover" as const,
-        /** 1:1 ทำให้บล็อก hero สูงมาก รูปมาสคอตมีพื้นขาวด้านล่าง — ใช้สัดส่วนเตี้ย + ยึดด้านบนเพื่อครอปขาวล่างและดึง body ใกล้ภาพ */
-        aspectRatio: "20:13",
-        gravity: "top"
+        type: "box" as const,
+        layout: "vertical" as const,
+        paddingAll: "10px",
+        contents: [
+          {
+            type: "image" as const,
+            url: heroUrl,
+            size: "full" as const,
+            aspectMode: "cover" as const,
+            /** 1:1 ทำให้บล็อก hero สูงมาก รูปมาสคอตมีพื้นขาวด้านล่าง — ใช้สัดส่วนเตี้ย + ยึดด้านบนเพื่อครอปขาวล่างและดึง body ใกล้ภาพ */
+            aspectRatio: "20:13",
+            gravity: "top"
+          }
+        ]
       },
       body: {
         type: "box" as const,
@@ -74,6 +81,7 @@ export function buildDrinkMilestoneFlexMessage(level: DrinkMilestoneLevel, drink
             text: copy.title,
             weight: "bold" as const,
             size: "xl" as const,
+            align: "center" as const,
             wrap: true
           },
           {
@@ -82,6 +90,7 @@ export function buildDrinkMilestoneFlexMessage(level: DrinkMilestoneLevel, drink
             size: "md" as const,
             weight: "bold" as const,
             color: BRAND,
+            align: "center" as const,
             wrap: true
           },
           {
@@ -89,6 +98,7 @@ export function buildDrinkMilestoneFlexMessage(level: DrinkMilestoneLevel, drink
             text: copy.body,
             size: "sm" as const,
             color: TEXT_MUTED,
+            align: "center" as const,
             wrap: true
           },
           { type: "separator" as const },
@@ -97,6 +107,7 @@ export function buildDrinkMilestoneFlexMessage(level: DrinkMilestoneLevel, drink
             text: `🍺 จำนวนแก้ว: ${drinkCount}`,
             size: "sm" as const,
             color: BRAND,
+            align: "center" as const,
             weight: "bold" as const
           }
         ]

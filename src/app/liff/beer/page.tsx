@@ -4,7 +4,6 @@ import { drinkCooldownRemainingSec } from "@/lib/drink-rules";
 import { liffProfileImageSrc } from "@/lib/liff-profile-image";
 import { AlertTriangle, Beer, Plus } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -214,12 +213,9 @@ export default function LiffBeerPage() {
               {startingLogin ? "กำลังพาไป LINE Login..." : "Login with LINE"}
             </button>
             {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
-            <Link
-              href="/liff/status"
-              className="mt-6 inline-block text-sm text-zinc-500 underline underline-offset-2"
-            >
+            <a href="/liff/energy" className="mt-6 inline-block text-sm text-zinc-500 underline underline-offset-2">
               กลับไปดูสถานะ
-            </Link>
+            </a>
           </div>
         </div>
       </main>
@@ -301,13 +297,13 @@ export default function LiffBeerPage() {
         </p>
 
         <div className="mt-6 flex justify-center">
-          <Link
-            href="/liff/status"
+          <a
+            href="/liff/energy"
             className="inline-flex items-center gap-2 rounded-xl border border-zinc-600 px-5 py-2.5 text-sm text-zinc-200 hover:bg-zinc-900"
           >
             <Beer className="h-4 w-4" />
             กลับไปดูสถานะ
-          </Link>
+          </a>
         </div>
       </div>
     </main>
