@@ -22,6 +22,9 @@ yarn-error.log*
 .env*.local
 .env
 
+# local-only docs (maintain locally; not shared via repo)
+docs/README.md
+
 # user uploads (payment slips, etc.)
 /public/uploads/
 
