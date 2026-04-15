@@ -1,3 +1,4 @@
+import { broadcastCheckInDisplay } from "@/lib/checkin-display-broadcast";
 import { buildCheckinConfirmedFlexMessage } from "@/lib/line-flex-checkin-confirmed";
 import { safePushFlexMessage } from "@/lib/line";
 import { syncRichMenuByBookingStatus } from "@/lib/line-richmenu";
@@ -81,6 +82,17 @@ export async function POST(request: NextRequest) {
   });
   await safePushFlexMessage(booking.lineUserId, flex);
   await syncRichMenuByBookingStatus(booking.lineUserId, booking.status);
+  const guestNumber = await prisma.booking.count({ where: { status: "checked_in" } });
+  broadcastCheckInDisplay({
+    fullName: booking.fullName,
+    pictureUrl: booking.linePictureUrl ?? null,
+    checkedInAt: (booking.checkedInAt ?? now).toISOString(),
+    source: "admin",
+    guestNumber,
+    drinkCount: booking.drinkCount ?? 0,
+    bookingId: booking.id,
+    checkedOutAt: booking.checkedOutAt ? booking.checkedOutAt.toISOString() : null
+  });
   auditLog("info", "booking_checked_in", { bookingId: booking.id, bookingCode: booking.bookingCode });
 
   return NextResponse.json({ message: "Checked in successfully", booking });

@@ -233,25 +233,26 @@ export default function CheckinPage() {
               <th className="px-4 py-3">LINE</th>
               <th className="px-4 py-3">เวลาเช็คอิน</th>
               <th className="px-4 py-3 text-center">แก้ว</th>
+              <th className="px-4 py-3 text-center">ในงาน</th>
               <th className="px-4 py-3">เวลาเช็คเอาท์</th>
             </tr>
           </thead>
           <tbody>
             {rosterLoading ? (
               <tr>
-                <td className="muted px-4 py-6" colSpan={7}>
+                <td className="muted px-4 py-6" colSpan={8}>
                   กำลังโหลดรายชื่อ…
                 </td>
               </tr>
             ) : rosterError ? (
               <tr>
-                <td className="px-4 py-8 text-center text-sm text-red-600" colSpan={7}>
+                <td className="px-4 py-8 text-center text-sm text-red-600" colSpan={8}>
                   {rosterError}
                 </td>
               </tr>
             ) : roster.length === 0 ? (
               <tr>
-                <td className="muted px-4 py-8 text-center" colSpan={7}>
+                <td className="muted px-4 py-8 text-center" colSpan={8}>
                   ไม่พบรายการตามเงื่อนไข
                 </td>
               </tr>
@@ -266,6 +267,17 @@ export default function CheckinPage() {
                     {row.checkedInAt ? new Date(row.checkedInAt).toLocaleString("th-TH") : "-"}
                   </td>
                   <td className="px-4 py-3 text-center tabular-nums">{row.drinkCount ?? 0}</td>
+                  <td className="px-4 py-3 text-center">
+                    {row.checkedOutAt != null && row.checkedOutAt !== "" ? (
+                      <span className="rounded-full bg-zinc-200 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                        เช็คเอาท์แล้ว
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-900">
+                        อยู่ในงาน
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     {row.checkedOutAt != null && row.checkedOutAt !== ""
                       ? new Date(row.checkedOutAt).toLocaleString("th-TH")

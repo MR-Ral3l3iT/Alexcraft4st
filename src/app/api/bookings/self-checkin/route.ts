@@ -4,6 +4,7 @@ import {
   formatThaiRemaining,
   remainingUntil
 } from "@/lib/checkin-response";
+import { broadcastCheckInDisplay } from "@/lib/checkin-display-broadcast";
 import { getEffectiveEventSettings } from "@/lib/event-settings";
 import { buildCheckinConfirmedFlexMessage } from "@/lib/line-flex-checkin-confirmed";
 import { safePushFlexMessage } from "@/lib/line";
@@ -170,6 +171,17 @@ export async function POST(request: NextRequest) {
     });
     await safePushFlexMessage(booking.lineUserId, flex);
     await syncRichMenuByBookingStatus(booking.lineUserId, latest.status);
+    const guestNumber = await prisma.booking.count({ where: { status: "checked_in" } });
+    broadcastCheckInDisplay({
+      fullName: latest.fullName,
+      pictureUrl: latest.linePictureUrl ?? null,
+      checkedInAt: (latest.checkedInAt ?? now).toISOString(),
+      source: "self",
+      guestNumber,
+      drinkCount: latest.drinkCount ?? 0,
+      bookingId: latest.id,
+      checkedOutAt: latest.checkedOutAt ? latest.checkedOutAt.toISOString() : null
+    });
   }
 
   auditLog("info", "booking_self_checked_in", {

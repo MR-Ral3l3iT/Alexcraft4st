@@ -44,3 +44,35 @@ body {
 .muted {
   color: var(--text-subtle);
 }
+
+/* หน้าจอ TV check-in — popup แจ้งเช็คอินใหม่ */
+@keyframes tv-checkin-popup-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.tv-checkin-popup-panel {
+  animation: tv-checkin-popup-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes tv-checkin-sparkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.05);
+  }
+}
+
+.tv-checkin-sparkle {
+  animation: tv-checkin-sparkle 1.2s ease-in-out infinite;
+}

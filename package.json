@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "Event registration and check-in platform",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.mjs",
+    "dev:next": "next dev",
     "tunnel": "ngrok http 3000",
     "tunnel:cf": "cloudflared tunnel --url http://localhost:3000",
     "tunnel:lt": "lt --port 3000",
     "dev:tunnel": "concurrently -k \"npm run dev\" \"npm run tunnel\"",
     "build": "next build",
-    "start": "next start",
+    "start": "node server.mjs",
     "lint": "eslint .",
     "test": "vitest run",
     "prisma:generate": "prisma generate",
@@ -29,7 +30,9 @@
     "lucide-react": "^1.7.0",
     "next": "^16.2.2",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",

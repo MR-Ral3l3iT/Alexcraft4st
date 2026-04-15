@@ -53,7 +53,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <p className="text-xs muted">Booking + Check-in Console</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="rounded-xl border border-zinc-200 p-2">
+            <button type="button" className="rounded-xl border border-zinc-200 p-2" aria-label="การแจ้งเตือน">
               <Bell className="h-4 w-4" />
             </button>
             <div className="accent-chip rounded-full px-3 py-1 text-xs font-semibold">Hi, Admin</div>

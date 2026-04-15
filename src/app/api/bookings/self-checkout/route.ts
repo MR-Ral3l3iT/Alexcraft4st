@@ -1,5 +1,7 @@
+import { broadcastCheckoutDisplay } from "@/lib/checkin-display-broadcast";
 import { buildCheckoutCompleteFlexMessage } from "@/lib/line-flex-checkout-complete";
 import { safePushFlexMessage } from "@/lib/line";
+import { syncRichMenuAfterSelfCheckout } from "@/lib/line-richmenu";
 import { prisma } from "@/lib/prisma";
 import { auditLog } from "@/lib/security/audit";
 import { sanitizeText } from "@/lib/security/input";
@@ -70,6 +72,12 @@ export async function POST(request: NextRequest) {
       checkoutAt: latest.checkedOutAt ?? now
     });
     await safePushFlexMessage(latest.lineUserId, flex);
+    await syncRichMenuAfterSelfCheckout(latest.lineUserId);
+    broadcastCheckoutDisplay({
+      bookingId: latest.id,
+      checkedOutAt: (latest.checkedOutAt ?? now).toISOString(),
+      drinkCount: latest.drinkCount ?? 0
+    });
   }
 
   auditLog("info", "booking_self_checked_out", {
