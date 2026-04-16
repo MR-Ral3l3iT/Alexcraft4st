@@ -75,8 +75,16 @@ export async function GET(request: NextRequest) {
 
   const settings = await getEffectiveEventSettings();
 
+  // Pending: show current admin "Payment Amount (THB)" so LIFF matches Settings after price changes.
+  // Other statuses: keep amount stored on the booking (what was agreed / used for review).
+  const paymentAmountForDisplay =
+    booking.status === "pending"
+      ? settings.paymentAmountThb
+      : (booking.paymentAmount ?? settings.paymentAmountThb);
+
   return NextResponse.json({
     ...booking,
+    paymentAmount: paymentAmountForDisplay,
     paymentBankName: settings.paymentBankName,
     paymentAccountName: settings.paymentAccountName,
     paymentAccountNo: settings.paymentAccountNo
