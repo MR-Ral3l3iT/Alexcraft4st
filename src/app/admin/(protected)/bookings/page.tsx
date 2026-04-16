@@ -5,7 +5,7 @@ import { liffProfileImageSrc } from "@/lib/liff-profile-image";
 import { canTransition } from "@/lib/booking-rules";
 import type { BookingStatus } from "@prisma/client";
 import { kanit } from "@/fonts";
-import { Ban, Check, ChevronDown, ChevronLeft, ChevronRight, ImageIcon, Search, X } from "lucide-react";
+import { Ban, Check, ChevronDown, ChevronLeft, ChevronRight, ImageIcon, Search, Send, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 
@@ -77,6 +77,7 @@ export default function AdminBookingsPage() {
   const [slipPreview, setSlipPreview] = useState<SlipPreview | null>(null);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const [confirmSubmitting, setConfirmSubmitting] = useState(false);
+  const [remindingSlipId, setRemindingSlipId] = useState<string | null>(null);
 
   useEffect(() => {
     const id = window.setTimeout(() => setDebouncedQ(q.trim()), 280);
@@ -120,6 +121,23 @@ export default function AdminBookingsPage() {
     },
     [load]
   );
+
+  async function remindSlipAttachment(id: string) {
+    setRemindingSlipId(id);
+    try {
+      const res = await fetch(`/api/bookings/${id}/remind-slip`, { method: "POST" });
+      const body = (await res.json().catch(() => ({}))) as { message?: string };
+      if (!res.ok) {
+        window.alert(body.message ?? `ส่งไม่สำเร็จ (${res.status})`);
+        return;
+      }
+      window.alert("ส่งข้อความแจ้งเตือนทาง LINE แล้ว");
+    } catch {
+      window.alert("เกิดข้อผิดพลาดระหว่างส่งข้อความ");
+    } finally {
+      setRemindingSlipId(null);
+    }
+  }
 
   useEffect(() => {
     void load();
@@ -199,7 +217,7 @@ export default function AdminBookingsPage() {
       </section>
 
       <section className="admin-panel overflow-x-auto">
-        <table className="min-w-[800px] w-full text-sm">
+        <table className="min-w-[880px] w-full text-sm">
           <thead className="bg-zinc-50 text-left">
             <tr>
               <th className="px-4 py-3">Code</th>
@@ -229,9 +247,11 @@ export default function AdminBookingsPage() {
             ) : (
               rows.map((row) => {
                 const canOpenSlip = Boolean(row.slipUrl);
+                const canRemindSlip = row.status === "pending" && !row.slipUrl;
                 const canApprove = canTransition(row.status, "confirmed");
                 const canRejectSlip = row.status === "waiting_payment_review" && canTransition(row.status, "pending");
                 const canCancelBooking = canTransition(row.status, "cancelled");
+                const slipRemindBusy = remindingSlipId === row.id;
 
                 const profileSrc = liffProfileImageSrc(row.linePictureUrl);
                 return (
@@ -284,6 +304,17 @@ export default function AdminBookingsPage() {
                             <ImageIcon className="h-4 w-4" />
                           </span>
                         )}
+                        {canRemindSlip ? (
+                          <button
+                            type="button"
+                            title="ส่งข้อความ LINE แจ้งให้แนบสลิปการโอนเงิน"
+                            disabled={slipRemindBusy}
+                            className={actionButtonClass(slipRemindBusy)}
+                            onClick={() => void remindSlipAttachment(row.id)}
+                          >
+                            <Send className={`h-4 w-4 ${slipRemindBusy ? "text-zinc-400" : "text-sky-600"}`} />
+                          </button>
+                        ) : null}
                         <button
                           type="button"
                           title="อนุมัติชำระเงิน (รอตรวจสลิป)"
