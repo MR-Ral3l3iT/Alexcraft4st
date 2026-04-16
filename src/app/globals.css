@@ -19,14 +19,30 @@ body {
 }
 
 .admin-shell {
-  display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
+  position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+}
+
+@media (min-width: 768px) {
+  .admin-shell {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
 }
 
 .admin-sidebar {
   background: var(--sidebar);
   color: #fff;
+}
+
+@media (min-width: 768px) {
+  .admin-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
 }
 
 .admin-panel {

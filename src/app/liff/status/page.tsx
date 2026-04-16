@@ -2,6 +2,7 @@
 
 import { bookingStatusLabel } from "@/lib/booking";
 import { liffProfileImageSrc } from "@/lib/liff-profile-image";
+import { PaymentSlipForm } from "@/components/booking/PaymentSlipForm";
 import { AlertTriangle } from "lucide-react";
 import Image from "next/image";
 import { FormEvent, Suspense, useEffect, useState } from "react";
@@ -38,7 +39,7 @@ function statusHighlightStyle(status: BookingStatusResponse["status"]) {
       return {
         panel: "border-amber-400/80 bg-gradient-to-b from-amber-50 to-orange-50/80 text-amber-950",
         kicker: "text-amber-800/90",
-        hint: "ชำระเงินและแนบสลิปในหน้าชำระเงินเมื่อพร้อม"
+        hint: "ชำระเงินและแนบสลิปเมื่อพร้อม"
       };
     case "waiting_payment_review":
       return {
@@ -355,7 +356,23 @@ function StatusPageContent() {
           </p>
         )}
 
-        {!loadingBooking && booking ? <BookingStatusPanel booking={booking} /> : null}
+        {!loadingBooking && booking ? (
+          <>
+            <BookingStatusPanel booking={booking} />
+
+            {booking.status === "pending" && booking.bookingCode ? (
+              <section className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5 text-zinc-900 shadow-sm">
+                <h2 className="text-base font-semibold">แนบสลิปเพิ่มเติม</h2>
+                <p className="mt-1 text-sm text-zinc-600">อัปโหลดหลักฐานการชำระเงินเพื่อส่งให้ทีมงานตรวจสอบ</p>
+                <PaymentSlipForm
+                  bookingCode={booking.bookingCode}
+                  initialSlipUrl={null}
+                  initialStatus={booking.status}
+                />
+              </section>
+            ) : null}
+          </>
+        ) : null}
 
         {!loadingBooking && bookingNotFound && profile?.lineUserId ? (
           <section className="mt-4 rounded-2xl border-2 border-zinc-300 bg-zinc-100 p-6 text-center">

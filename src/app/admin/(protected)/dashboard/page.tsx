@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { CheckCircle2, Clock3, Tickets, Users } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const [pending, confirmed, checkedIn, total] = await Promise.all([
     prisma.booking.count({ where: { status: { in: ["pending", "waiting_payment_review"] } } }),

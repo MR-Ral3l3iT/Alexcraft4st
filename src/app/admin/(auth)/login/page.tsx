@@ -15,26 +15,39 @@ export default function AdminLoginPage() {
     event.preventDefault();
     setLoading(true);
     setError("");
-    const response = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-    if (!response.ok) {
-      const data = (await response.json()) as { message?: string };
-      setError(data.message || "Login failed");
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      if (!response.ok) {
+        const raw = await response.text();
+        let message = `Login failed (${response.status})`;
+        if (raw) {
+          try {
+            const data = JSON.parse(raw) as { message?: string };
+            if (data?.message) message = data.message;
+          } catch {
+            message = raw.slice(0, 160);
+          }
+        }
+        setError(message);
+        setLoading(false);
+        return;
+      }
+      router.push("/admin/dashboard");
+      router.refresh();
+    } catch {
+      setError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
       setLoading(false);
-      return;
     }
-    router.push("/admin/dashboard");
-    router.refresh();
   }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md items-center p-6">
       <section className="admin-panel w-full p-6">
-        <h1 className="mb-1 text-xl font-semibold">Admin Login</h1>
-        <p className="mb-4 text-sm muted">Demo login เพื่อเข้าใช้งานหลังบ้าน</p>
+        <h1 className="mb-4 text-xl font-semibold">Admin Login</h1>
 
         <form className="space-y-3" onSubmit={onSubmit}>
           <label className="block">
