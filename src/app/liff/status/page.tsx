@@ -2,6 +2,7 @@
 
 import { bookingStatusLabel } from "@/lib/booking";
 import { liffProfileImageSrc } from "@/lib/liff-profile-image";
+import { PaymentQrCard } from "@/components/booking/PaymentQrCard";
 import { PaymentSlipForm } from "@/components/booking/PaymentSlipForm";
 import { AlertTriangle } from "lucide-react";
 import Image from "next/image";
@@ -31,6 +32,14 @@ type BookingStatusResponse = {
   seats: number;
   status: "pending" | "waiting_payment_review" | "confirmed" | "cancelled" | "checked_in";
   checkedInAt: string | null;
+  paymentAmount: number | null;
+  paymentRef: string | null;
+  paymentQrImageUrl: string | null;
+  paymentExpiresAt: string | null;
+  slipUrl: string | null;
+  paymentBankName: string | null;
+  paymentAccountName: string | null;
+  paymentAccountNo: string | null;
 };
 
 function statusHighlightStyle(status: BookingStatusResponse["status"]) {
@@ -362,11 +371,21 @@ function StatusPageContent() {
 
             {booking.status === "pending" && booking.bookingCode ? (
               <section className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5 text-zinc-900 shadow-sm">
-                <h2 className="text-base font-semibold">แนบสลิปเพิ่มเติม</h2>
-                <p className="mt-1 text-sm text-zinc-600">อัปโหลดหลักฐานการชำระเงินเพื่อส่งให้ทีมงานตรวจสอบ</p>
+                <h2 className="text-base font-semibold">ชำระเงินและแนบสลิป</h2>
+                <p className="mt-1 text-sm text-zinc-600">สแกน QR เพื่อชำระเงิน แล้วอัปโหลดสลิปด้านล่าง</p>
+                <PaymentQrCard
+                  bookingCode={booking.bookingCode}
+                  initialAmount={booking.paymentAmount}
+                  initialRef={booking.paymentRef}
+                  initialImageUrl={booking.paymentQrImageUrl}
+                  initialExpiresAt={booking.paymentExpiresAt}
+                  bankName={booking.paymentBankName}
+                  accountName={booking.paymentAccountName}
+                  accountNo={booking.paymentAccountNo}
+                />
                 <PaymentSlipForm
                   bookingCode={booking.bookingCode}
-                  initialSlipUrl={null}
+                  initialSlipUrl={booking.slipUrl}
                   initialStatus={booking.status}
                 />
               </section>

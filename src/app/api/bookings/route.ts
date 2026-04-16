@@ -60,7 +60,12 @@ export async function GET(request: NextRequest) {
       checkedInAt: true,
       createdAt: true,
       lineDisplay: true,
-      linePictureUrl: true
+      linePictureUrl: true,
+      paymentAmount: true,
+      paymentRef: true,
+      paymentQrImageUrl: true,
+      paymentExpiresAt: true,
+      slipUrl: true
     }
   });
 
@@ -68,7 +73,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Booking not found" }, { status: 404 });
   }
 
-  return NextResponse.json(booking);
+  const settings = await getEffectiveEventSettings();
+
+  return NextResponse.json({
+    ...booking,
+    paymentBankName: settings.paymentBankName,
+    paymentAccountName: settings.paymentAccountName,
+    paymentAccountNo: settings.paymentAccountNo
+  });
 }
 
 export async function POST(request: NextRequest) {
