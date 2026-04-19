@@ -21,6 +21,7 @@
     "line:richmenu:create:confirmed": "node scripts/line/create-richmenu.mjs --preset confirmed",
     "line:richmenu:create:checked-in": "node scripts/line/create-richmenu.mjs --preset checked_in",
     "line:richmenu:link": "node scripts/line/link-richmenu.mjs",
+    "line:richmenu:relink-all": "node scripts/line/relink-richmenu-by-status.mjs",
     "db:reset-user-flow": "node scripts/db/reset-user-flow.mjs"
   },
   "private": true,
