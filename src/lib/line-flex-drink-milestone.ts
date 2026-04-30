@@ -20,12 +20,20 @@ export function drinkMilestoneLevelForCount(drinkCount: number): DrinkMilestoneL
   return null;
 }
 
+function buildRewardBoxLiffUri(level: DrinkMilestoneLevel): string | null {
+  const liffId = process.env.LIFF_ID?.trim();
+  if (!liffId) return null;
+  const milestone = encodeURIComponent(String(level));
+  return `https://liff.line.me/${liffId}/liff/reward-box?milestone=${milestone}`;
+}
+
 /**
  * Flex แจ้ง milestone แก้ว (LINE ต้องเข้าถึง hero URL ได้ — ตั้ง APP_BASE_URL เป็น https ในโปรดักชัน)
  */
 export function buildDrinkMilestoneFlexMessage(level: DrinkMilestoneLevel, drinkCount: number) {
   const base = getServerAppBaseUrl().replace(/\/$/, "");
   const heroUrl = `${base}${HERO_PATH[level]}`;
+  const rewardBoxUri = buildRewardBoxLiffUri(level);
 
   const copy = {
     1: {
@@ -104,6 +112,14 @@ export function buildDrinkMilestoneFlexMessage(level: DrinkMilestoneLevel, drink
           { type: "separator" as const },
           {
             type: "text" as const,
+            text: "🎁 รางวัลพิเศษ: เปิดกล่องลุ้นรางวัลจากของรางวัลในงาน",
+            size: "sm" as const,
+            color: TEXT_MUTED,
+            align: "center" as const,
+            wrap: true
+          },
+          {
+            type: "text" as const,
             text: `🍺 จำนวนแก้ว: ${drinkCount}`,
             size: "sm" as const,
             color: BRAND,
@@ -111,7 +127,30 @@ export function buildDrinkMilestoneFlexMessage(level: DrinkMilestoneLevel, drink
             weight: "bold" as const
           }
         ]
-      }
+      },
+      ...(rewardBoxUri
+        ? {
+            footer: {
+              type: "box" as const,
+              layout: "vertical" as const,
+              spacing: "sm" as const,
+              contents: [
+                {
+                  type: "button" as const,
+                  style: "primary" as const,
+                  height: "sm" as const,
+                  action: {
+                    type: "uri" as const,
+                    label: "เปิดกล่องรางวัล",
+                    uri: rewardBoxUri
+                  },
+                  color: BRAND,
+                  flex: 1
+                }
+              ]
+            }
+          }
+        : {})
     }
   };
 }

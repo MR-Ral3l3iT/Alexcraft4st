@@ -26,6 +26,7 @@ type GuestRow = {
 };
 
 const EVENT_TITLE = "ALEXCRAFT 4TH ANNIVERSARY EVENT NIGHT";
+const BEER_HIGHLIGHT_MS = 60_000;
 
 function normalizeDrinkCount(value: unknown): number {
   const num = typeof value === "number" ? value : Number(value);
@@ -118,6 +119,26 @@ export function CheckinTvClient() {
   const celebrationQueueRef = useRef<CheckinDisplayPayload[]>([]);
   const celebrationPlayingRef = useRef(false);
   const flushCelebrationQueueRef = useRef<() => void>(() => {});
+  const beerGlowTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const [beerGlowUntil, setBeerGlowUntil] = useState<Record<string, number>>({});
+
+  const scheduleBeerGlow = useCallback((bookingId: string) => {
+    const existing = beerGlowTimersRef.current.get(bookingId);
+    if (existing) window.clearTimeout(existing);
+
+    const until = Date.now() + BEER_HIGHLIGHT_MS;
+    setBeerGlowUntil((prev) => ({ ...prev, [bookingId]: until }));
+
+    const timerId = window.setTimeout(() => {
+      beerGlowTimersRef.current.delete(bookingId);
+      setBeerGlowUntil((prev) => {
+        const next = { ...prev };
+        delete next[bookingId];
+        return next;
+      });
+    }, BEER_HIGHLIGHT_MS);
+    beerGlowTimersRef.current.set(bookingId, timerId);
+  }, []);
 
   useEffect(() => {
     try {
@@ -203,10 +224,20 @@ export function CheckinTvClient() {
 
     const onCheckIn = (data: CheckinDisplayPayload) => {
       setConnectionError(null);
-      celebrationQueueRef.current.push(data);
-      flushCelebrationQueue();
+      const isDrinkOnly = data.kind === "drink";
+      if (!isDrinkOnly) {
+        celebrationQueueRef.current.push(data);
+        flushCelebrationQueue();
+      }
 
       setGuests((prev) => {
+        const prevRow = prev.find((g) => g.bookingId === data.bookingId);
+        const prevDrinks = prevRow ? normalizeDrinkCount(prevRow.drinkCount) : null;
+        const nextDrinks = normalizeDrinkCount(data.drinkCount);
+        const shouldGlow =
+          Boolean(isDrinkOnly && data.bookingId) &&
+          (prevDrinks === null ? nextDrinks > 0 : nextDrinks > prevDrinks);
+
         const next = prev.some((g) => g.bookingId === data.bookingId)
           ? prev.map((g) =>
               g.bookingId === data.bookingId
@@ -233,9 +264,15 @@ export function CheckinTvClient() {
               },
               ...prev
             ];
-        return sortGuestsForDisplay(next);
+        const sorted = sortGuestsForDisplay(next);
+        if (shouldGlow) {
+          queueMicrotask(() => scheduleBeerGlow(data.bookingId));
+        }
+        return sorted;
       });
-      setCheckedInCount((c) => Math.max(c, data.guestNumber));
+      if (!isDrinkOnly) {
+        setCheckedInCount((c) => Math.max(c, data.guestNumber));
+      }
     };
 
     const onCheckout = (payload: CheckinDisplayCheckoutPayload) => {
@@ -273,8 +310,13 @@ export function CheckinTvClient() {
       celebrationPlayingRef.current = false;
       flushCelebrationQueueRef.current = () => {};
       setPopup(null);
+      for (const timerId of beerGlowTimersRef.current.values()) {
+        window.clearTimeout(timerId);
+      }
+      beerGlowTimersRef.current.clear();
+      setBeerGlowUntil({});
     };
-  }, []);
+  }, [scheduleBeerGlow]);
 
   const timeLabel = now.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false });
   const recentStrip = useMemo(() => recentGuestsByCheckInTime(guests, 12), [guests]);
@@ -367,7 +409,11 @@ export function CheckinTvClient() {
                 {guests.map((g) => (
                   <article
                     key={g.bookingId}
-                    className="relative flex flex-col items-center overflow-hidden rounded-xl border border-zinc-800/90 bg-zinc-900/40 px-2.5 py-3 text-center shadow-lg shadow-black/20"
+                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border bg-zinc-900/40 px-2.5 py-3 text-center shadow-lg shadow-black/20 ${
+                      beerGlowUntil[g.bookingId] && beerGlowUntil[g.bookingId] > now.getTime()
+                        ? "tv-beer-glow-card border-orange-400/55 ring-2 ring-orange-300/55"
+                        : "border-zinc-800/90"
+                    }`}
                   >
                     <div className="absolute right-2 top-2 z-10">
                       <PresenceCornerBadge checkedOutAt={g.checkedOutAt} />

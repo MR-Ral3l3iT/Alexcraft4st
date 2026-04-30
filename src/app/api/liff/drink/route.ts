@@ -1,5 +1,6 @@
 import { drinkNicknameForCount } from "@/lib/drink-nickname";
 import { drinkCooldownRemainingSec } from "@/lib/drink-rules";
+import { broadcastCheckInDisplay } from "@/lib/checkin-display-broadcast";
 import { getEffectiveEventSettings } from "@/lib/event-settings";
 import { buildDrinkMilestoneFlexMessage, drinkMilestoneLevelForCount } from "@/lib/line-flex-drink-milestone";
 import { safePushFlexMessage } from "@/lib/line";
@@ -141,8 +142,45 @@ export async function POST(request: NextRequest) {
 
   const fresh = await prisma.booking.findUnique({
     where: { lineUserId },
-    select: { status: true, drinkCount: true, drinkLastAt: true, bookingCode: true }
+    select: { id: true, status: true, drinkCount: true, drinkLastAt: true, bookingCode: true }
   });
+
+  if (fresh?.id) {
+    const row = await prisma.booking.findUnique({
+      where: { id: fresh.id },
+      select: {
+        fullName: true,
+        linePictureUrl: true,
+        checkedInAt: true,
+        checkedOutAt: true
+      }
+    });
+    if (row && fresh.status === "checked_in" && row.checkedInAt) {
+      const baseTime = row.checkedInAt;
+      const guestNumber =
+        (await prisma.booking.count({
+          where: {
+            status: "checked_in",
+            OR: [
+              { checkedInAt: { lt: baseTime } },
+              { checkedInAt: baseTime, id: { lte: fresh.id } }
+            ]
+          }
+        })) || 1;
+
+      broadcastCheckInDisplay({
+        fullName: row.fullName,
+        pictureUrl: row.linePictureUrl,
+        checkedInAt: baseTime.toISOString(),
+        source: "self",
+        guestNumber,
+        drinkCount: fresh.drinkCount ?? 0,
+        bookingId: fresh.id,
+        checkedOutAt: row.checkedOutAt ? row.checkedOutAt.toISOString() : null,
+        kind: "drink"
+      });
+    }
+  }
 
   auditLog("info", "booking_drink_increment", {
     lineUserId,

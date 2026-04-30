@@ -15,6 +15,11 @@ enum BookingStatus {
   checked_in
 }
 
+enum RewardType {
+  general
+  coupon
+}
+
 model Booking {
   id            String        @id @default(cuid())
   lineUserId    String        @unique
@@ -42,6 +47,7 @@ model Booking {
   updatedAt     DateTime      @updatedAt
   statusLogs    BookingStatusLog[]
   checkinLogs   CheckinLog[]
+  rewardDraws   RewardDraw[]
 
   @@index([status])
   @@index([phone])
@@ -105,4 +111,42 @@ model EventSettings {
   paymentAccountName String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+model Reward {
+  id            String     @id @default(cuid())
+  code          String     @unique
+  name          String
+  type          RewardType @default(general)
+  quantity      Int        @default(0)
+  imageUrl      String
+  couponStartAt DateTime?
+  couponEndAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  rewardDraws   RewardDraw[]
+
+  @@index([type])
+  @@index([createdAt])
+}
+
+// 1 ครั้งต่อ milestone (3/6/10 แก้ว) ต่อ 1 booking — ใช้เก็บผลสุ่ม + กันกดซ้ำ
+model RewardDraw {
+  id              String   @id @default(cuid())
+  bookingId       String
+  lineUserId      String
+  milestoneLevel  Int
+  won             Boolean
+  rewardId        String?
+  rewardName      String?
+  loseReason      String?
+  winProbability  Float
+  createdAt       DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  reward  Reward? @relation(fields: [rewardId], references: [id], onDelete: SetNull)
+
+  @@unique([bookingId, milestoneLevel])
+  @@index([lineUserId, milestoneLevel])
+  @@index([createdAt])
 }

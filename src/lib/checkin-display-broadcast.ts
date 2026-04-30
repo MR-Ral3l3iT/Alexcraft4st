@@ -14,6 +14,8 @@ export type CheckinDisplayPayload = {
   bookingId: string;
   /** ยังอยู่ในงาน = null | เช็คเอาท์แล้ว = ISO time */
   checkedOutAt: string | null;
+  /** ระบุเหตุผลของอัปเดทบนจอ TV — drink = เติมแก้ว */
+  kind?: "checkin" | "drink";
 };
 
 /** อัปเดตหน้าจอ TV หลัง self-checkout */

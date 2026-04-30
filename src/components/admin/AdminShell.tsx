@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, ChartNoAxesCombined, Menu, QrCode, Settings, Ticket, X } from "lucide-react";
+import { Bell, ChartNoAxesCombined, Gift, Menu, QrCode, Settings, Ticket, X } from "lucide-react";
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,6 +11,7 @@ const menu = [
   { href: "/admin/dashboard", label: "Dashboard", icon: ChartNoAxesCombined },
   { href: "/admin/bookings", label: "Bookings", icon: Ticket },
   { href: "/admin/checkin", label: "Check-in", icon: QrCode },
+  { href: "/admin/rewards", label: "Rewards", icon: Gift },
   { href: "/admin/settings", label: "Settings", icon: Settings }
 ];
 
