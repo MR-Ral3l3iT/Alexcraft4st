@@ -7,7 +7,7 @@ import { createRewardDrawForMilestone, milestoneLevelFromQuery, type DrinkMilest
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-type GetResponse = {
+export type GetResponse = {
   hasDraw: boolean;
   won?: boolean;
   rewardName?: string | null;
@@ -16,20 +16,32 @@ type GetResponse = {
   message?: string;
 };
 
-type PostResponse = GetResponse & {
+/** ข้อความ error มาตรฐายของ route นี้ */
+export type ErrorJson = {
+  message: string;
+  code: string;
+};
+
+export type PostSuccessResponse = GetResponse & {
   pushed?: boolean;
 };
+
+/** Client: parse ร่าง body ของ POST ได้ทั้ง success หรือ error */
+export type PostResponse = PostSuccessResponse | ErrorJson;
+
+/** Client: parse ร่าง body ของ GET ได้ทั้งข้อมูลหรือ error */
+export type GetJsonResponse = GetResponse | ErrorJson;
 
 export async function GET(request: NextRequest) {
   const lineUserId = sanitizeText(request.nextUrl.searchParams.get("lineUserId") ?? "", 120);
   const milestone = milestoneLevelFromQuery(request.nextUrl.searchParams.get("milestone"));
   if (!lineUserId) {
-    return NextResponse.json({ message: "ต้องระบุ lineUserId", code: "LINE_USER_REQUIRED" } satisfies PostResponse, {
+    return NextResponse.json({ message: "ต้องระบุ lineUserId", code: "LINE_USER_REQUIRED" } satisfies ErrorJson, {
       status: 400
     });
   }
   if (!milestone) {
-    return NextResponse.json({ message: "milestone ไม่ถูกต้อง", code: "BAD_MILESTONE" } satisfies PostResponse, {
+    return NextResponse.json({ message: "milestone ไม่ถูกต้อง", code: "BAD_MILESTONE" } satisfies ErrorJson, {
       status: 400
     });
   }
@@ -39,7 +51,7 @@ export async function GET(request: NextRequest) {
     select: { id: true }
   });
   if (!booking) {
-    return NextResponse.json({ message: "ไม่พบการจอง", code: "BOOKING_NOT_FOUND" } satisfies PostResponse, {
+    return NextResponse.json({ message: "ไม่พบการจอง", code: "BOOKING_NOT_FOUND" } satisfies ErrorJson, {
       status: 404
     });
   }
@@ -70,7 +82,7 @@ export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "local";
   const limiter = rateLimit(`liff:reward-draw:${ip}`, 30, 60_000);
   if (!limiter.allowed) {
-    return NextResponse.json({ message: "เรียกบ่อยเกินไป กรุณารอสักครู่", code: "RATE_LIMIT" } satisfies PostResponse, {
+    return NextResponse.json({ message: "เรียกบ่อยเกินไป กรุณารอสักครู่", code: "RATE_LIMIT" } satisfies ErrorJson, {
       status: 429
     });
   }
@@ -79,12 +91,12 @@ export async function POST(request: NextRequest) {
   const lineUserId = sanitizeText(body.lineUserId ?? "", 120);
   const milestone = body.milestoneLevel as DrinkMilestoneLevel | undefined;
   if (!lineUserId) {
-    return NextResponse.json({ message: "กรุณาเข้าสู่ระบบ LINE", code: "LINE_USER_REQUIRED" } satisfies PostResponse, {
+    return NextResponse.json({ message: "กรุณาเข้าสู่ระบบ LINE", code: "LINE_USER_REQUIRED" } satisfies ErrorJson, {
       status: 400
     });
   }
   if (milestone !== 1 && milestone !== 2 && milestone !== 3) {
-    return NextResponse.json({ message: "milestone ไม่ถูกต้อง", code: "BAD_MILESTONE" } satisfies PostResponse, {
+    return NextResponse.json({ message: "milestone ไม่ถูกต้อง", code: "BAD_MILESTONE" } satisfies ErrorJson, {
       status: 400
     });
   }
@@ -122,23 +134,23 @@ export async function POST(request: NextRequest) {
       milestoneLevel: milestone,
       pushed,
       message: result.alreadyExists ? "เปิดกล่องไปแล้วใน milestone นี้" : undefined
-    } satisfies PostResponse);
+    } satisfies PostSuccessResponse);
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
     if (code === "BOOKING_NOT_FOUND") {
-      return NextResponse.json({ message: "ไม่พบการจอง", code: "BOOKING_NOT_FOUND" } satisfies PostResponse, {
+      return NextResponse.json({ message: "ไม่พบการจอง", code: "BOOKING_NOT_FOUND" } satisfies ErrorJson, {
         status: 404
       });
     }
     if (code === "MILESTONE_NOT_REACHED") {
       return NextResponse.json(
-        { message: "ยังไม่ถึงเงื่อนไข milestone สำหรับการเปิดกล่อง", code: "MILESTONE_NOT_REACHED" } satisfies PostResponse,
+        { message: "ยังไม่ถึงเงื่อนไข milestone สำหรับการเปิดกล่อง", code: "MILESTONE_NOT_REACHED" } satisfies ErrorJson,
         { status: 400 }
       );
     }
 
     auditLog("error", "reward_draw_failed", { lineUserId, milestoneLevel: milestone, code });
-    return NextResponse.json({ message: "เปิดกล่องไม่สำเร็จ", code: "REWARD_DRAW_FAILED" } satisfies PostResponse, {
+    return NextResponse.json({ message: "เปิดกล่องไม่สำเร็จ", code: "REWARD_DRAW_FAILED" } satisfies ErrorJson, {
       status: 500
     });
   }

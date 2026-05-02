@@ -4,7 +4,8 @@ import type { CheckinDisplayCheckoutPayload, CheckinDisplayPayload } from "@/lib
 import { playCheckInChime } from "@/lib/checkin-chime";
 import { drinkNicknameForCount } from "@/lib/drink-nickname";
 import { liffProfileImageSrc } from "@/lib/liff-profile-image";
-import { MessageSquare } from "lucide-react";
+import { MapPin, MessageSquare } from "lucide-react";
+import Link from "next/link";
 import { io, type Socket } from "socket.io-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -119,8 +120,10 @@ export function CheckinTvClient() {
   const celebrationQueueRef = useRef<CheckinDisplayPayload[]>([]);
   const celebrationPlayingRef = useRef(false);
   const flushCelebrationQueueRef = useRef<() => void>(() => {});
-  const beerGlowTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  /** ใน browser `setTimeout` คืน `number` — ใช้ชนิดนี้เพื่อไม่ชนกับ `NodeJS.Timeout` ตอน typecheck */
+  const beerGlowTimersRef = useRef(new globalThis.Map<string, number>());
   const [beerGlowUntil, setBeerGlowUntil] = useState<Record<string, number>>({});
+  const [displayTvToken, setDisplayTvToken] = useState("");
 
   const scheduleBeerGlow = useCallback((bookingId: string) => {
     const existing = beerGlowTimersRef.current.get(bookingId);
@@ -138,6 +141,10 @@ export function CheckinTvClient() {
       });
     }, BEER_HIGHLIGHT_MS);
     beerGlowTimersRef.current.set(bookingId, timerId);
+  }, []);
+
+  useEffect(() => {
+    setDisplayTvToken(new URLSearchParams(window.location.search).get("token") ?? "");
   }, []);
 
   useEffect(() => {
@@ -356,6 +363,18 @@ export function CheckinTvClient() {
               <MessageSquare className="h-4 w-4 shrink-0 text-zinc-900" strokeWidth={2} aria-hidden />
               Live preview
             </button>
+            <Link
+              href={
+                displayTvToken
+                  ? `/display/checkin-map?token=${encodeURIComponent(displayTvToken)}`
+                  : "/display/checkin-map"
+              }
+              className="inline-flex items-center gap-2 rounded-full border border-zinc-600 bg-zinc-900 px-3.5 py-2 text-xs font-bold text-zinc-100 shadow-sm transition hover:bg-zinc-800 sm:text-sm"
+              title="แผนที่งาน — ตัวละครเดินแบบสุ่ม"
+            >
+              <MapPin className="h-4 w-4 shrink-0 text-zinc-100" strokeWidth={2} aria-hidden />
+              แผนที่งาน
+            </Link>
             <p className="text-xs text-zinc-300 sm:text-sm">
               <span className="text-zinc-500">จำนวนคนเข้างาน </span>
               <span className="font-mono tabular-nums font-semibold text-[var(--brand)]">{checkedInCount}</span>

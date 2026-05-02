@@ -124,12 +124,12 @@ export async function createRewardDrawForMilestone(input: {
       where: { bookingId_milestoneLevel: { bookingId: booking.id, milestoneLevel: input.milestoneLevel } }
     });
     if (existing) {
-      const reward =
-        existing.rewardId &&
-        (await tx.reward.findUnique({
-          where: { id: existing.rewardId },
-          select: { imageUrl: true }
-        }));
+      const reward = existing.rewardId
+        ? await tx.reward.findUnique({
+            where: { id: existing.rewardId },
+            select: { imageUrl: true }
+          })
+        : null;
 
       return {
         alreadyExists: true,
