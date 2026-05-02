@@ -11,7 +11,8 @@ const ALLOWED_LIFF_PATHS = new Set([
   "/liff/checkin",
   "/liff/status",
   "/liff/register",
-  "/liff/callback"
+  "/liff/callback",
+  "/liff/reward-box"
 ]);
 
 /**
@@ -20,7 +21,10 @@ const ALLOWED_LIFF_PATHS = new Set([
  */
 function deepLinkPathFromSearchParams(sp: ReturnType<typeof useSearchParams>): string {
   const pDirect = sp.get("p")?.trim() ?? "";
-  if (pDirect && ALLOWED_LIFF_PATHS.has(pDirect)) return pDirect;
+  if (pDirect) {
+    const pHead = pDirect.split(/[?#]/)[0]?.trim() ?? "";
+    if (pHead && ALLOWED_LIFF_PATHS.has(pHead)) return pDirect;
+  }
 
   const liffStateRaw = sp.get("liff.state");
   if (!liffStateRaw) return "";
@@ -53,7 +57,10 @@ function deepLinkPathFromSearchParams(sp: ReturnType<typeof useSearchParams>): s
   try {
     const nested = new URLSearchParams(qsSource);
     const pNested = nested.get("p")?.trim() ?? "";
-    if (pNested && ALLOWED_LIFF_PATHS.has(pNested)) return pNested;
+    if (pNested) {
+      const nHead = pNested.split(/[?#]/)[0]?.trim() ?? "";
+      if (nHead && ALLOWED_LIFF_PATHS.has(nHead)) return pNested;
+    }
   } catch {
     /* ignore */
   }

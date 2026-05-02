@@ -23,8 +23,9 @@ export function drinkMilestoneLevelForCount(drinkCount: number): DrinkMilestoneL
 function buildRewardBoxLiffUri(level: DrinkMilestoneLevel): string | null {
   const liffId = process.env.LIFF_ID?.trim();
   if (!liffId) return null;
-  const milestone = encodeURIComponent(String(level));
-  return `https://liff.line.me/${liffId}/liff/reward-box?milestone=${milestone}`;
+  /** ใช้ `?p=/liff/...` ให้สอดคล้องกับ LIFF Endpoint แบบ `{APP_BASE_URL}/liff` (path หลัง liff.line.me/id/ มักไม่ถูกส่งต่อ) */
+  const pathWithQuery = `/liff/reward-box?milestone=${encodeURIComponent(String(level))}`;
+  return `https://liff.line.me/${liffId}?p=${encodeURIComponent(pathWithQuery)}`;
 }
 
 /**
