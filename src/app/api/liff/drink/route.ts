@@ -176,6 +176,7 @@ export async function POST(request: NextRequest) {
         guestNumber,
         drinkCount: fresh.drinkCount ?? 0,
         bookingId: fresh.id,
+        bookingCode: fresh.bookingCode ?? null,
         checkedOutAt: row.checkedOutAt ? row.checkedOutAt.toISOString() : null,
         kind: "drink"
       });

@@ -12,6 +12,8 @@ export type CheckinDisplayPayload = {
   /** จำนวนแก้ว ณ เวลาเช็คอิน — ใช้คำนวณฉายาบนหน้าจอ TV */
   drinkCount: number;
   bookingId: string;
+  /** รหัสจอง BK-… — ใช้จับคู่ env แผนที่ผู้จัดโดยไม่ต้องใส่ internal id */
+  bookingCode?: string | null;
   /** ยังอยู่ในงาน = null | เช็คเอาท์แล้ว = ISO time */
   checkedOutAt: string | null;
   /** ระบุเหตุผลของอัปเดทบนจอ TV — drink = เติมแก้ว */

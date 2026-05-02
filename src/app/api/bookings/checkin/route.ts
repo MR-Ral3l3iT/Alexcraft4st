@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
     guestNumber,
     drinkCount: booking.drinkCount ?? 0,
     bookingId: booking.id,
+    bookingCode: booking.bookingCode ?? null,
     checkedOutAt: booking.checkedOutAt ? booking.checkedOutAt.toISOString() : null
   });
   auditLog("info", "booking_checked_in", { bookingId: booking.id, bookingCode: booking.bookingCode });

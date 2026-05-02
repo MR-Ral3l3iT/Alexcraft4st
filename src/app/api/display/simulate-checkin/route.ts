@@ -24,6 +24,7 @@ type SimulateBody = {
   drinkCount?: number;
   source?: "self" | "admin";
   pictureUrl?: string | null;
+  bookingCode?: string | null;
 };
 
 /**
@@ -67,6 +68,11 @@ export async function POST(request: NextRequest) {
     guestNumber = 90_000 + Math.floor(Math.random() * 9_000);
   }
 
+  const simCode =
+    typeof body.bookingCode === "string" && body.bookingCode.trim()
+      ? body.bookingCode.trim()
+      : null;
+
   const payload: CheckinDisplayPayload = {
     fullName: typeof body.fullName === "string" && body.fullName.trim() ? body.fullName.trim() : "Sim check-in",
     pictureUrl: body.pictureUrl === null || body.pictureUrl === undefined ? null : String(body.pictureUrl),
@@ -78,6 +84,7 @@ export async function POST(request: NextRequest) {
         ? Math.max(0, Math.floor(body.drinkCount))
         : 0,
     bookingId,
+    bookingCode: simCode,
     checkedOutAt: null
   };
 

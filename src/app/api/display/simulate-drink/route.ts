@@ -26,6 +26,7 @@ type SimulateDrinkBody = {
   pictureUrl?: string | null;
   checkedInAt?: string;
   source?: "self" | "admin";
+  bookingCode?: string | null;
 };
 
 /**
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
     source: body.source === "admin" ? "admin" : "self",
     guestNumber: Math.floor(body.guestNumber),
     drinkCount: Math.floor(body.drinkCount),
+    bookingCode: body.bookingCode?.trim() ? body.bookingCode.trim() : null,
     checkedOutAt: null,
     kind: "drink"
   };

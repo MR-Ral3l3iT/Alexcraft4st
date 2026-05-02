@@ -31,6 +31,15 @@ export default async function BookingDetailPage({ params }: Props) {
           <p>ชื่อ: {booking.fullName}</p>
           <p>เบอร์: {booking.phone}</p>
           <p>LINE User: {booking.lineUserId}</p>
+          <p className="break-all">
+            <span className="font-medium text-zinc-700">รหัสระบบ (Booking ID): </span>
+            <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs">{booking.id}</code>
+          </p>
+          <p className="text-xs text-zinc-500">
+            URL หน้านี้คือ <code className="font-mono text-[11px]">/admin/bookings/{booking.id}</code> — ใช้รหัสหลัง{" "}
+            <span className="font-mono">/bookings/</span> หรือรหัสจอง <span className="font-mono">BK-…</span> ใน env{" "}
+            <code className="rounded bg-zinc-100 px-1">NEXT_PUBLIC_DISPLAY_MAP_ORGANIZER_BOOKING_IDS</code>
+          </p>
           <p>รหัสจอง: {booking.bookingCode ?? "-"}</p>
           <p>สถานะ: {bookingStatusLabel(booking.status)}</p>
           <p>สิทธิ์เข้าร่วม: {booking.seats} ที่</p>

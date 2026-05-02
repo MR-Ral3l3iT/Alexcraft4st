@@ -180,6 +180,7 @@ export async function POST(request: NextRequest) {
       guestNumber,
       drinkCount: latest.drinkCount ?? 0,
       bookingId: latest.id,
+      bookingCode: latest.bookingCode ?? null,
       checkedOutAt: latest.checkedOutAt ? latest.checkedOutAt.toISOString() : null
     });
   }

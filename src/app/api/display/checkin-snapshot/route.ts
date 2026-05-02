@@ -16,6 +16,7 @@ function tokensMatch(provided: string, expected: string): boolean {
 
 export type CheckinSnapshotGuest = {
   bookingId: string;
+  bookingCode: string | null;
   fullName: string;
   pictureUrl: string | null;
   checkedInAt: string;
@@ -39,11 +40,20 @@ export async function GET(request: NextRequest) {
   const rows = await prisma.booking.findMany({
     where: { status: "checked_in" },
     orderBy: { checkedInAt: "asc" },
-    select: { id: true, fullName: true, linePictureUrl: true, checkedInAt: true, drinkCount: true, checkedOutAt: true }
+    select: {
+      id: true,
+      bookingCode: true,
+      fullName: true,
+      linePictureUrl: true,
+      checkedInAt: true,
+      drinkCount: true,
+      checkedOutAt: true
+    }
   });
 
   const guests: CheckinSnapshotGuest[] = rows.map((r, i) => ({
     bookingId: r.id,
+    bookingCode: r.bookingCode ?? null,
     fullName: r.fullName,
     pictureUrl: r.linePictureUrl,
     checkedInAt: (r.checkedInAt ?? new Date()).toISOString(),

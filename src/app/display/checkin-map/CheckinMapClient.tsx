@@ -19,6 +19,7 @@ const EVENT_TITLE = "ALEXCRAFT 4TH ANNIVERSARY EVENT NIGHT";
 
 type GuestRow = {
   bookingId: string;
+  bookingCode?: string | null;
   fullName: string;
   pictureUrl: string | null;
   checkedInAt: string;
@@ -156,8 +157,15 @@ function loadCharacterBundle(charId: MapCharId): Promise<CharacterBundle> {
   return bundlePromises[charId]!;
 }
 
-function resolveCharId(bookingId: string, pickCache: Map<string, MapCharId>): MapCharId {
-  if (isOrganizerBookingId(bookingId)) return 3;
+function resolveCharId(
+  bookingId: string,
+  bookingCode: string | null | undefined,
+  pickCache: Map<string, MapCharId>
+): MapCharId {
+  if (isOrganizerBookingId(bookingId, bookingCode)) {
+    pickCache.set(bookingId, 3);
+    return 3;
+  }
   const hit = pickCache.get(bookingId);
   if (hit) return hit;
   const v = stableChar12(bookingId);
@@ -203,6 +211,7 @@ export function CheckinMapClient() {
       const normalized = (data.guests ?? []).map((g) => ({
         ...g,
         bookingId: typeof g.bookingId === "string" ? g.bookingId : `guest-${g.guestNumber}`,
+        bookingCode: g.bookingCode == null || g.bookingCode === undefined ? null : String(g.bookingCode),
         checkedOutAt: g.checkedOutAt == null ? null : String(g.checkedOutAt),
         drinkCount: normalizeDrinkCount(g.drinkCount)
       }));
@@ -260,6 +269,7 @@ export function CheckinMapClient() {
                     checkedInAt: data.checkedInAt,
                     guestNumber: data.guestNumber,
                     drinkCount: normalizeDrinkCount(data.drinkCount),
+                    bookingCode: data.bookingCode ?? g.bookingCode ?? null,
                     checkedOutAt: data.checkedOutAt ?? null
                   }
                 : g
@@ -267,6 +277,7 @@ export function CheckinMapClient() {
           : [
               {
                 bookingId: data.bookingId,
+                bookingCode: data.bookingCode ?? null,
                 fullName: data.fullName,
                 pictureUrl: data.pictureUrl,
                 checkedInAt: data.checkedInAt,
@@ -311,7 +322,7 @@ export function CheckinMapClient() {
     const now = performance.now();
     for (const g of activeGuests) {
       const existing = map.get(g.bookingId);
-      const charId = resolveCharId(g.bookingId, picks);
+      const charId = resolveCharId(g.bookingId, g.bookingCode ?? null, picks);
       if (!existing) {
         const t = pickTarget();
         map.set(g.bookingId, {
@@ -336,7 +347,7 @@ export function CheckinMapClient() {
   useEffect(() => {
     const ids = new Set<MapCharId>();
     for (const g of activeGuests) {
-      ids.add(resolveCharId(g.bookingId, charPickRef.current));
+      ids.add(resolveCharId(g.bookingId, g.bookingCode ?? null, charPickRef.current));
     }
     void Promise.all(
       [...ids].map(async (id) => {
