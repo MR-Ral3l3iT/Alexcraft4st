@@ -9,7 +9,7 @@
     "tunnel:cf": "cloudflared tunnel --url http://localhost:3000",
     "tunnel:lt": "lt --port 3000",
     "dev:tunnel": "concurrently -k \"npm run dev\" \"npm run tunnel\"",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "node server.mjs",
     "lint": "eslint .",
     "test": "vitest run",
@@ -29,6 +29,7 @@
   "dependencies": {
     "@line/bot-sdk": "^11.0.0",
     "@prisma/client": "^6.19.3",
+    "prisma": "^6.19.3",
     "lucide-react": "^1.7.0",
     "next": "^16.2.2",
     "react": "^19.2.4",
@@ -47,7 +48,6 @@
     "eslint-config-next": "^16.2.2",
     "localtunnel": "^2.0.2",
     "postcss": "^8.5.9",
-    "prisma": "^6.19.3",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
     "vitest": "^1.6.0"
